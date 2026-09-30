@@ -1,69 +1,466 @@
-# FreelanceChain
+# FreelanceChain 🚀
 
-A MERN workspace for client projects, freelancer proposals, and milestone approval.
+### Decentralized Freelancing Platform
 
-## What this version includes
+FreelanceChain is a full-stack freelancing platform designed to connect **clients and freelancers** in a secure and transparent digital environment.
 
-- Client and freelancer registration and login.
-- Password recovery by a one-time link that expires after 15 minutes. Old login sessions are invalidated after a reset.
-- Expired sessions return users to login with a clear message. Login and registration attempts are limited on each server instance.
-- Clients create projects with a detailed brief, required skills, budget, deadline, and up to 20 planned milestones.
-- Clients can preview a guided milestone draft from their brief, skills, and budget, then apply and edit it before publishing.
-- Clients can explicitly request an AI-assisted milestone draft when a backend OpenAI key is configured; they preview and edit it before publishing.
-- Freelancers maintain a professional profile with skills, experience, bio, and portfolio link.
-- Freelancers search/filter open projects, review the full brief, send a proposal, and track application status.
-- Clients review proposals alongside applicant profiles and assign one freelancer.
-- Clients choose milestone prerequisites, and dependent steps unlock when every prerequisite is approved.
-- Assigned freelancers submit work; clients can approve it or request a revision with feedback. Resubmissions retain their history.
-- The project view shows progress, prerequisites, submissions, and an activity record for new actions.
-- Freelancers can see a trust score based on approved milestones and revisions. Clients see each applicant's verified history and an explained fit estimate.
-- Clients can explicitly request an AI-assisted applicant comparison when an OpenAI API key is configured; the regular shortlist remains available without one.
-- Client dashboards highlight overdue deadlines, pending reviews and open revisions with explicit reasons; project pages show the same attention signals.
-- Active projects show a delivery outlook from observed approval pace, repeated revisions and inactivity, with a suggested next step and clear uncertainty.
-- Authenticated live update signals refresh client and freelancer workspaces, applicant lists and milestone pages when another user changes a project.
-- Responsive homepage, auth screens, dashboards, and milestone view.
+The project combines modern web technologies with **blockchain-based concepts** to improve trust, transparency, and security in freelance transactions.
 
-The milestone amounts are **planning figures only**. This version does not process payments. The guided draft uses fixed templates and keyword signals; it is not a trained AI model. The optional AI draft proposes steps and relative weights; the backend validates dependencies and calculates amounts. Matching is a transparent, rule-based estimate, not a prediction of project success.
+---
 
-AI milestone drafting sends the title, brief, skills, budget and deadline to OpenAI only after the client clicks **Draft with AI**. The interface asks clients to remove personal information first. API responses are requested without storage (`store: false`); no draft is stored locally until the client publishes a project. If the AI service fails or returns an invalid plan, the client can still use the guided draft or enter steps manually. The route is client-only and has a one-minute request cooldown. Set `OPENAI_API_KEY` on the backend to enable it; `OPENAI_PLAN_MODEL` can override the default `gpt-4o-mini`. A live model has not been exercised in this local demo without a key.
+## 📌 Project Overview
 
-## Delivery outlook
+Traditional freelancing platforms usually depend on centralized systems for:
 
-For an active project with at least two approved milestones at least a day apart, the app calculates the observed days between approvals and projects a rough finish date for the remaining milestones. It compares that date with the deadline and separately flags repeated revisions on unfinished work or at least seven days without recorded activity. If there is too little approval history, it says so instead of inventing a date. The client dashboard and project page show the evidence and a suggested next action. This is a transparent baseline, not a trained AI risk model or a probability of failure. It has not been calibrated on historical project outcomes.
+* Job posting
+* Freelancer applications
+* Project communication
+* Payment processing
+* Work management
+* User reviews and ratings
 
-## Live updates
+FreelanceChain explores a decentralized approach where users can interact directly while blockchain technology can be used to provide transparency and security for important transactions.
 
-The backend provides an authenticated event stream at `GET /api/updates`. It sends only an update type and project ID to the project client or assigned freelancer; the browser then fetches fresh data through the existing protected API. New or assigned projects also signal freelancer marketplace views, and new applications signal the relevant client. The UI shows **Live updates** while connected and reconnects after a temporary disconnection. A reconnect refreshes the visible data to catch missed events. The stream is in memory on one backend process; a deployment using multiple server instances needs shared pub/sub for cross-instance updates.
+The project was developed as part of **Semester 3** academic coursework.
 
-## Trust and matching
+---
 
-Trust is calculated from approved milestones. A milestone with one or more revision requests counts as revised once in the score, so repeated requests on that milestone cannot keep reducing it. Each client account contributes at most three approval-equivalents, even across multiple projects. Revised approvals fill those slots first, so extra clean milestones from the same account cannot dilute existing revisions. This limits score inflation from splitting one client's work into many small milestones. The score is drawn toward a neutral baseline when there is little capped evidence; freelancers with no approved milestones are shown as **New** without a numeric score. The profile and shortlist show the raw approval count, the capped count, the number of client accounts, completed projects, and revision requests. This is a limited safeguard, not identity verification or proof that client accounts are independent. Self-reported profile fields cannot directly change trust.
+## 🎯 Objectives
 
-The client shortlist compares case-insensitive skill names (70% weight), self-reported years of experience (15%), and verified trust (15%). If trust is unavailable, its weight is removed and the remaining weights are normalized, so new freelancers are not penalized for missing history. The UI shows matched and missing skills and keeps the hiring decision with the client. This is an explainable starting point for later AI research, not a trained recommendation system.
+The main objectives of FreelanceChain are:
 
-The optional AI comparison uses `text-embedding-3-small` embeddings to compare the project brief with applicant profile/proposal text, then combines text similarity (60%) and the regular fit estimate (40%). The client must choose **Compare with AI**; the page says which text goes to OpenAI. No vectors or AI rankings are saved. Scores are ordering aids, not hiring probabilities. Set `OPENAI_API_KEY` in the backend environment to enable it. See [MATCHING_EVALUATION.md](MATCHING_EVALUATION.md) for the synthetic diagnostic result and what is still needed for a real validation claim.
+* Provide a platform for clients to post freelance projects.
+* Allow freelancers to discover and apply for projects.
+* Provide separate workflows for clients and freelancers.
+* Improve transparency between clients and freelancers.
+* Provide secure project and payment management.
+* Explore blockchain integration for decentralized transactions.
+* Provide real-time communication between users.
+* Maintain project-related information in a structured database.
 
-## Run locally
+---
 
-1. Install Node.js and start a local MongoDB server.
-2. In `backend`, run `npm ci`, copy `.env.example` to `.env`, and set a unique `JWT_SECRET` of at least 32 characters.
-3. Run `npm start` in `backend` (default API: `http://localhost:5000`). The server waits for MongoDB before accepting requests.
-4. In the project root, run `npm ci` and `npm start` (default UI: `http://localhost:3000`).
+## ✨ Key Features
 
-For a different backend address, set `REACT_APP_API_URL` in a root `.env.local` file, for example `REACT_APP_API_URL=http://localhost:5000/api`.
+### 👤 User Management
 
-For a single-service production build, run `npm run build` in the project root, then `npm start` in `backend` with `NODE_ENV=production`, `MONGO_URI`, and `JWT_SECRET` set. The backend serves the built frontend and API from one origin, so no frontend API URL override is needed. Set `CLIENT_ORIGIN` only when the frontend lives on a separate origin. `GET /api/health` reports database connectivity. Do not seed demo data in production.
+* User registration and authentication
+* Login/logout functionality
+* User profiles
+* Client and freelancer roles
+* Profile information management
 
-Password recovery needs `APP_ORIGIN` set to the frontend origin. For Gmail delivery during a small local demo, set `RESET_DELIVERY=gmail`, `GMAIL_USER`, and `GMAIL_APP_PASSWORD` in `backend/.env`; see [EMAIL_SETUP.md](EMAIL_SETUP.md). For a public deployment using Resend, set `RESEND_API_KEY` and `RESET_FROM_EMAIL` instead. For a local demo only, set `RESET_DELIVERY=console` and use a localhost `APP_ORIGIN`; the reset link is printed in the backend terminal and is never returned by the API. The forgot-password page states whether this server sends email or prints a local link. Public deployments should use HTTPS and a suitable email provider. The request endpoint gives the same response for registered and unknown addresses and limits repeat requests.
+### 💼 Freelance Marketplace
 
-## Check the build
+Clients can:
 
-Run `npm test -- --watch=false` and `npm run build` from the project root. Run `node workflow.test.js`, `node scoring.test.js`, `node insights.test.js`, `node outlook.test.js`, `node planner.test.js`, `node aiPlanner.test.js`, `node resetMail.test.js`, `node semanticMatching.test.js`, `node liveUpdates.test.js`, and `node integration.test.js` in `backend`. The integration test needs local MongoDB; it creates and removes only its own uniquely named test database. `npm run eval:matching` runs the fictional matching diagnostic without an API key.
+* Create projects/jobs
+* Add project descriptions
+* Specify requirements
+* Define project budgets
+* Review freelancer applications
 
-See [DEMO_GUIDE.md](DEMO_GUIDE.md) for a repeatable capstone demo and local demo data.
+Freelancers can:
 
-## Current scope
+* Browse available projects
+* View project details
+* Apply for suitable projects
+* Manage their applications
+* Track project-related activities
 
-The working source now includes phases 1–16: workflow repairs, a frontend refresh, the core marketplace journey, milestone revisions/dependencies/activity, a trust-aware shortlist, real-database workflow testing and demo setup, transparent project attention analytics, an editable guided milestone draft, password recovery, an opt-in embedding comparison with a diagnostic evaluation harness, optional AI-assisted milestone drafting, a transparent delivery outlook, final workflow/auth checks, live project update signals, a per-client trust evidence cap, and a mobile/keyboard accessibility pass with Gmail reset delivery support. The Phase 13 [FINAL_QA_REPORT.md](FINAL_QA_REPORT.md) is a historical checkpoint. Live Gmail delivery still needs account credentials to verify. Live model behavior and real-world relevance/fairness remain unvalidated without an API key and consented labelled data. The attention and outlook signals are not a trained predictive AI risk model. Older projects without explicit dependencies continue to unlock sequentially; earlier actions cannot be reconstructed into the new activity record.
-#   F r e e l a n c e C h a i n _ S e m 3  
- 
+### 💬 Real-Time Communication
+
+The platform can provide real-time communication between users for project-related discussions.
+
+This helps clients and freelancers communicate without depending on external communication platforms.
+
+### 💰 Payment Management
+
+FreelanceChain is designed around secure digital payments between clients and freelancers.
+
+Blockchain technology can be used to make important transaction records more transparent and verifiable.
+
+### 🔗 Blockchain Integration
+
+Blockchain is used as part of the project's decentralized architecture.
+
+Smart contracts can help automate and secure important transaction-related operations.
+
+### 📁 Project Management
+
+The platform can maintain project information such as:
+
+* Project details
+* Client information
+* Freelancer information
+* Applications
+* Project status
+* Payment information
+
+---
+
+## 🏗️ System Architecture
+
+The project follows a full-stack architecture:
+
+```text
+                    ┌─────────────────────┐
+                    │       Client        │
+                    │      Browser        │
+                    └──────────┬──────────┘
+                               │
+                               ▼
+                    ┌─────────────────────┐
+                    │      Frontend       │
+                    │   React / Web UI    │
+                    └──────────┬──────────┘
+                               │
+                         REST API / WebSocket
+                               │
+                               ▼
+                    ┌─────────────────────┐
+                    │       Backend       │
+                    │ Node.js + Express   │
+                    └──────┬─────────┬────┘
+                           │         │
+                           ▼         ▼
+                  ┌────────────┐  ┌─────────────┐
+                  │  MongoDB   │  │ Blockchain  │
+                  │  Database  │  │ / Contracts │
+                  └────────────┘  └──────┬──────┘
+                                         │
+                                         ▼
+                                  ┌─────────────┐
+                                  │   Wallet /  │
+                                  │ Blockchain  │
+                                  └─────────────┘
+```
+
+---
+
+## 🛠️ Technology Stack
+
+### Frontend
+
+* React.js
+* HTML5
+* CSS3
+* JavaScript
+* Tailwind CSS
+
+### Backend
+
+* Node.js
+* Express.js
+* REST APIs
+* Socket.io
+
+### Database
+
+* MongoDB
+
+### Blockchain
+
+* Ethereum
+* Solidity
+* Smart Contracts
+* Hardhat
+* Ethers.js
+
+### Development Tools
+
+* Git
+* GitHub
+* Visual Studio Code
+* npm
+
+---
+
+## 📂 Project Structure
+
+A typical structure for the project is:
+
+```text
+FreelanceChain_Sem3/
+│
+├── frontend/
+│   ├── public/
+│   ├── src/
+│   ├── package.json
+│   └── ...
+│
+├── backend/
+│   ├── controllers/
+│   ├── models/
+│   ├── routes/
+│   ├── middleware/
+│   ├── server.js
+│   └── package.json
+│
+├── blockchain/
+│   ├── contracts/
+│   ├── scripts/
+│   ├── test/
+│   ├── hardhat.config.js
+│   └── package.json
+│
+├── README.md
+└── .gitignore
+```
+
+> Update the folder names above if the actual repository uses a different structure.
+
+---
+
+## ⚙️ Installation
+
+### 1. Clone the Repository
+
+```bash
+git clone https://github.com/itzsonu/FreelanceChain_Sem3.git
+```
+
+```bash
+cd FreelanceChain_Sem3
+```
+
+---
+
+### 2. Install Dependencies
+
+Install dependencies for the frontend:
+
+```bash
+cd frontend
+npm install
+```
+
+Install backend dependencies:
+
+```bash
+cd ../backend
+npm install
+```
+
+If blockchain code is included:
+
+```bash
+cd ../blockchain
+npm install
+```
+
+---
+
+## 🔐 Environment Variables
+
+Create a `.env` file according to the project's configuration.
+
+Example:
+
+```env
+PORT=5000
+MONGO_URI=your_mongodb_connection_string
+JWT_SECRET=your_jwt_secret
+```
+
+For blockchain configuration, environment variables may include:
+
+```env
+PRIVATE_KEY=your_wallet_private_key
+RPC_URL=your_rpc_url
+CONTRACT_ADDRESS=your_contract_address
+```
+
+**Never commit private keys, passwords, API keys, or other secrets to GitHub.**
+
+---
+
+## ▶️ Running the Project
+
+### Start Backend
+
+```bash
+cd backend
+npm start
+```
+
+or, if the project uses nodemon:
+
+```bash
+npm run dev
+```
+
+### Start Frontend
+
+Open another terminal:
+
+```bash
+cd frontend
+npm start
+```
+
+The application should then be available through the frontend development server.
+
+---
+
+## ⛓️ Running the Blockchain
+
+If the project uses Hardhat:
+
+```bash
+cd blockchain
+npx hardhat compile
+```
+
+Run the local blockchain:
+
+```bash
+npx hardhat node
+```
+
+Deploy the smart contracts using the project's deployment script.
+
+```bash
+npx hardhat run scripts/deploy.js --network localhost
+```
+
+> Use the exact deployment command defined in the repository if it differs from this example.
+
+---
+
+## 🔄 Application Workflow
+
+### Client Workflow
+
+```text
+Register / Login
+       ↓
+Client Dashboard
+       ↓
+Create Project
+       ↓
+Receive Applications
+       ↓
+Review Freelancer
+       ↓
+Select Freelancer
+       ↓
+Project Collaboration
+       ↓
+Payment
+       ↓
+Complete Project
+       ↓
+Review / Rating
+```
+
+### Freelancer Workflow
+
+```text
+Register / Login
+       ↓
+Freelancer Dashboard
+       ↓
+Browse Projects
+       ↓
+View Project Details
+       ↓
+Apply for Project
+       ↓
+Client Selection
+       ↓
+Project Collaboration
+       ↓
+Complete Work
+       ↓
+Receive Payment
+       ↓
+Project Completion
+```
+
+---
+
+## 🔒 Security Considerations
+
+The project considers security through:
+
+* User authentication
+* Role-based access
+* Protected API routes
+* Environment variables
+* Secure database operations
+* Smart-contract-based transaction logic
+* Wallet-based blockchain interaction
+
+Private keys and sensitive credentials should always remain outside the source code.
+
+---
+
+## 🌟 Advantages
+
+* Decentralized approach
+* Transparent transaction processing
+* Direct client–freelancer interaction
+* Reduced dependency on centralized payment systems
+* Secure project management
+* Real-time communication
+* Blockchain-based transaction verification
+* Full-stack web application architecture
+
+---
+
+## 🚀 Future Enhancements
+
+Possible future improvements include:
+
+* Advanced freelancer search and filtering
+* AI-based freelancer recommendations
+* Reputation system
+* Escrow smart contracts
+* Milestone-based payments
+* Dispute resolution through smart contracts
+* Decentralized identity
+* IPFS-based file storage
+* Advanced notifications
+* Mobile application
+* Multi-chain blockchain support
+* Automated invoice generation
+
+---
+
+## 📚 Academic Project
+
+**Project:** FreelanceChain
+**Semester:** 3
+**Project Type:** Full-Stack / Blockchain Application
+
+### Core Concepts
+
+* Full-Stack Web Development
+* MERN Stack
+* REST API
+* Real-Time Communication
+* Database Management
+* Blockchain
+* Smart Contracts
+* Web3 Integration
+
+---
+
+## 👨‍💻 Contributors
+
+**Sonu / ITZSONU**
+
+GitHub:
+
+https://github.com/itzsonu
+
+Repository:
+
+https://github.com/itzsonu/FreelanceChain_Sem3
+
+---
+
+## 📄 License
+
+This project is developed for educational and academic purposes.
