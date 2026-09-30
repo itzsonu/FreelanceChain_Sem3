@@ -138,7 +138,7 @@ The project follows a full-stack architecture:
 
 ---
 
-## 🛠️ Technology Stack
+##  Technology Stack
 
 ### Frontend
 
